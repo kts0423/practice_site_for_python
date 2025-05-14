@@ -69,12 +69,13 @@
       display: none;
       position: absolute;
       right: 0;
+      top: 100%; /* 버튼 바로 아래에 위치 */
       background-color: var(--nav-bg);
       min-width: 200px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.5);
       border-radius: 6px;
       overflow: hidden;
-      margin-top: 0.5rem;
+      margin-top: 0; /* hover 갭 제거 */
     }
     .dropdown-content a {
       color: var(--text-color);
