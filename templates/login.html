@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>로그인</h1>
+
+        {% if error %}
+            <p class="wrong">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+            <label for="student_id">학번:</label><br>
+            <input type="text" id="student_id" name="student_id"><br><br>
+
+            <label for="name">이름:</label><br>
+            <input type="text" id="name" name="name"><br><br>
+
+            <label><input type="checkbox" name="is_admin"> 관리자 로그인</label><br><br>
+
+            <button type="submit">로그인</button>
+        </form>
+
+        <p>계정이 없으신가요? <a href="{{ url_for('register') }}">회원가입</a></p>
+    </div>
+</body>
+</html>

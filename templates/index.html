@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}문제 연습{% endblock %}
+{% block content %}
+<h1>안녕하세요, {{ user.name }}님!</h1>
+
+{% if not user.is_admin %}
+<form method="POST" action="{{ url_for('generate') }}">
+    <label>문제 유형 선택:</label>
+    <select name="category">
+        <option value="for문" {% if category == 'for문' %}selected{% endif %}>for문</option>
+        <option value="if문" {% if category == 'if문' %}selected{% endif %}>if문</option>
+        <option value="리스트" {% if category == '리스트' %}selected{% endif %}>리스트</option>
+        <option value="함수" {% if category == '함수' %}selected{% endif %}>함수</option>
+        <option value="딕셔너리" {% if category == '딕셔너리' %}selected{% endif %}>딕셔너리</option>
+        <option value="문자열" {% if category == '문자열' %}selected{% endif %}>문자열</option>
+        <option value="중첩 for문" {% if category == '중첩 for문' %}selected{% endif %}>중첩 for문</option>
+    </select>
+
+    <label style="margin-left: 20px;">난이도:</label>
+    <select name="difficulty">
+        <option value="초급" {% if difficulty == '초급' %}selected{% endif %}>초급</option>
+        <option value="중급" {% if difficulty == '중급' %}selected{% endif %}>중급</option>
+        <option value="상급" {% if difficulty == '상급' %}selected{% endif %}>상급</option>
+    </select>
+
+    <button type="submit">문제 출제</button>
+</form>
+{% endif %}
+
+{% if problem %}
+<hr>
+<h2>문제</h2>
+<div class="result-box">{{ problem }}</div>
+<form method="POST" action="{{ url_for('submit') }}">
+    <label>코드를 입력하세요:</label><br>
+    <div style="display: flex;">
+        <div id="line-numbers" style="text-align: right; padding: 10px; background-color: #252525; color: #ffffff; user-select: none; line-height: 1.5; font-family: monospace; font-size: 14px; border-right: 1px solid #444; min-width: 30px;"></div>
+        <textarea name="code" id="code-area" rows="12" style="width: 100%; font-family: monospace; font-size: 14px; background-color: #1c1c1c; color: #f1f1f1; border: 1px solid #555; border-radius: 5px; padding: 10px; resize: vertical; line-height: 1.5;"></textarea>
+    </div>
+    <script>
+        const textarea = document.getElementById('code-area');
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+    </script>
+    <script>
+        const lineNumbers = document.getElementById('line-numbers');
+        const updateLineNumbers = () => {
+            const lines = textarea.value.split('\n').length;
+            lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        };
+        textarea.addEventListener('input', updateLineNumbers);
+        textarea.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = textarea.scrollTop;
+        });
+        updateLineNumbers();
+    </script>
+    <br>
+    <button type="submit">제출</button>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+<!-- templates/admin_user_dates.html -->
+{% extends "base.html" %}
+{% block title %}{{ user.name }}님의 날짜별 기록{% endblock %}
+{% block content %}
+<h1>🗓️ {{ user.name }}님의 기록 날짜</h1>
+<ul>
+  {% for item in dates %}
+    <li>
+      <a href="{{ url_for('admin_user_history_by_date', user_id=user.id, date=item.date) }}">
+        {{ item.date }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+<p>
+  <!-- 잘못된 admin_users → 올바른 admin_user_list 로 변경 -->
+  <a href="{{ url_for('admin_user_list') }}">← 사용자 목록으로</a>
+</p>
+{% endblock %}
