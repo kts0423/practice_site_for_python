@@ -1,40 +1,90 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}코딩 연습{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}" />
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/yourkit.js" crossorigin="anonymous"></script>
   <style>
-    nav a, nav span { color: #fff !important; }
-    nav a:hover   { color: #ddd !important; }
+    /* Header layout */
+    header {
+      position: relative;
+      width: 100%;
+      background: var(--nav-bg);
+      padding: 0.5rem 1rem;
+    }
+    .header-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .greeting {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #fff;
+    }
+    /* Dropdown menu at top-right */
+    .dropdown {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .dropbtn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--card-bg);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: #fff;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dropdown-content a:hover {
+      background-color: var(--hover-bg);
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
   </style>
 </head>
 <body>
-    <nav>
-        {% if user %}
-            {% if user.is_admin %}
-            <!-- 관리자 메뉴 -->
-            <span>안녕하세요, {{ user.name }}님</span>
-            <a href="{{ url_for('admin_user_list') }}">사용자 관리</a>
-            <a href="{{ url_for('logout') }}">로그아웃</a>
-            {% else %}
-            <!-- 학생 메뉴 -->
-            <a href="{{ url_for('index') }}">홈</a>
-            <span>안녕하세요, {{ user.name }}님</span>
-            <a href="{{ url_for('history') }}">내 히스토리</a>
-            <a href="{{ url_for('logout') }}">로그아웃</a>
-            {% endif %}
-        {% else %}
-            <!-- 비로그인 메뉴 -->
-            <a href="{{ url_for('login') }}">로그인</a>
-            <a href="{{ url_for('register') }}">회원가입</a>
-        {% endif %}
-    </nav>
-
-  <div class="container">
+  <header>
+    <div class="header-container">
+      <div class="greeting">안녕하세요, {{ user.name }}님</div>
+      <div class="dropdown">
+        <button class="dropbtn"><i class="fas fa-bars"></i></button>
+        <div class="dropdown-content">
+          <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> 홈</a>
+          <a href="{{ url_for('history') }}"><i class="fas fa-history"></i> 내 히스토리</a>
+          {% if user.is_admin %}
+          <a href="{{ url_for('admin_user_list') }}"><i class="fas fa-users-cog"></i> 사용자 관리</a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="container">
     {% block content %}{% endblock %}
-  </div>
+  </main>
 </body>
 </html>
