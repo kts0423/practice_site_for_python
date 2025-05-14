@@ -5,25 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}코딩 연습{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}" />
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
   <style>
-    /* Header layout */
+    :root {
+      --nav-bg: #1f1f1f;
+      --card-bg: #2b2b2b;
+      --hover-bg: #3a3a3a;
+      --text-color: #e0e0e0;
+      --accent-color: #00c5a5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
     header {
-      position: relative;
+      position: fixed;
+      top: 0;
       width: 100%;
       background: var(--nav-bg);
-      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      z-index: 1000;
     }
-    .header-container {
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
       position: relative;
     }
     .greeting {
+      flex: 1;
       text-align: center;
       font-size: 1.25rem;
-      font-weight: 500;
-      color: #fff;
-      margin: 0;
+      font-weight: 600;
+      color: var(--text-color);
     }
-    /* Dropdown menu at top-right */
     .dropdown {
       position: absolute;
       top: 50%;
@@ -31,27 +53,39 @@
       transform: translateY(-50%);
     }
     .dropbtn {
-      background: none;
+      background: var(--accent-color);
       border: none;
+      border-radius: 4px;
       color: #fff;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
+      padding: 0.5rem;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    .dropbtn:hover {
+      background: darken(var(--accent-color), 10%);
     }
     .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      background-color: var(--card-bg);
-      min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-      border-radius: 4px;
-      z-index: 100;
+      background-color: var(--nav-bg);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 0.5rem;
     }
     .dropdown-content a {
-      color: #fff;
+      color: var(--text-color);
       padding: 0.75rem 1rem;
       text-decoration: none;
-      display: block;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .dropdown-content a i {
+      margin-right: 0.5rem;
     }
     .dropdown-content a:hover {
       background-color: var(--hover-bg);
@@ -59,20 +93,37 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
+    main.container {
+      max-width: 1200px;
+      margin: 5rem auto 2rem; /* leave space for header */
+      padding: 1rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .greeting {
+        font-size: 1rem;
+      }
+      .dropbtn {
+        font-size: 1rem;
+        padding: 0.4rem;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1 class="greeting">안녕하세요, {{ user.name }}님</h1>
-    <div class="dropdown">
-      <button class="dropbtn">☰</button>
-      <div class="dropdown-content">
-        <a href="{{ url_for('index') }}">홈</a>
-        <a href="{{ url_for('history') }}">내 히스토리</a>
-        {% if user.is_admin %}
-        <a href="{{ url_for('admin_user_list') }}">사용자 관리</a>
-        {% endif %}
-        <a href="{{ url_for('logout') }}">로그아웃</a>
+    <div class="header-inner">
+      <div class="greeting">안녕하세요, {{ user.name }}님</div>
+      <div class="dropdown">
+        <button class="dropbtn"><i class="fas fa-bars"></i></button>
+        <div class="dropdown-content">
+          <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> 홈</a>
+          <a href="{{ url_for('history') }}"><i class="fas fa-history"></i> 내 히스토리</a>
+          {% if user.is_admin %}
+          <a href="{{ url_for('admin_user_list') }}"><i class="fas fa-users-cog"></i> 사용자 관리</a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
+        </div>
       </div>
     </div>
   </header>
