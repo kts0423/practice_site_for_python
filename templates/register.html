@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>회원가입</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입 - 코딩 연습</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}" />
 </head>
 <body>
-    <div class="container">
-        <h1>회원가입</h1>
-
-        {% if error %}
-            <p class="wrong">{{ error }}</p>
-        {% endif %}
-
-        <form method="POST">
-            <label for="student_id">학번:</label><br>
-            <input type="text" id="student_id" name="student_id"><br><br>
-
-            <label for="name">이름:</label><br>
-            <input type="text" id="name" name="name"><br><br>
-
-            <label><input type="checkbox" name="is_admin"> 관리자 계정 생성</label><br><br>
-
-            <button type="submit">회원가입</button>
-        </form>
-
-        <p>이미 계정이 있으신가요? <a href="{{ url_for('login') }}">로그인</a></p>
+  <main class="container">
+    <div class="form-card">
+      <h2>회원가입</h2>
+      {% if error %}
+      <div class="alert error">{{ error }}</div>
+      {% endif %}
+      <form action="{{ url_for('register') }}" method="post">
+        <div class="form-group">
+          <label for="username">아이디</label>
+          <input type="text" id="username" name="username" required autofocus />
+        </div>
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="name">이름</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="university">대학교</label>
+          <input type="text" id="university" name="university" required />
+        </div>
+        <button type="submit" class="btn">회원가입</button>
+      </form>
+      <p>이미 계정이 있으신가요? <a href="{{ url_for('login') }}">로그인</a></p>
     </div>
+  </main>
 </body>
 </html>

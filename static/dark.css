@@ -109,3 +109,94 @@ button:hover {
 .logout-button:hover {
     background-color: #d32f2f;
 }
+
+
+
+/* 카드 형태의 폼 박스 */
+.form-card {
+  max-width: 400px;
+  margin: 4rem auto;
+  background: var(--nav-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* 카드 제목 */
+.form-card h2 {
+  margin-bottom: 1.5rem;
+  color: var(--accent-color);
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+/* 각 입력 그룹 */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--hover-bg);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* 제출 버튼 */
+.btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #009f8c; /* accent-color 보다 살짝 진한 색 */
+}
+
+/* 에러 알림창 */
+.alert.error {
+  background: #b71c1c;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 링크 텍스트 */
+.form-card p {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.form-card p a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.form-card p a:hover {
+  text-decoration: underline;
+}
