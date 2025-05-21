@@ -200,3 +200,30 @@ button:hover {
 .form-card p a:hover {
   text-decoration: underline;
 }
+
+/* settings.html (계정 설정 카드) */
+.settings-card {
+    max-width: 400px;
+    margin: 4rem auto;
+    background: #1e1e1e;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+}
+
+.settings-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #03dac6;
+}
+.settings-card .form-group label {
+    font-weight: 500;
+}
+.settings-card .btn {
+    margin-top: 1rem;
+}
+.settings-card .alert {
+    background: #2c5732;
+    color: #c8f7c5;
+    font-weight: 600;
+}

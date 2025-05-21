@@ -93,7 +93,13 @@ def logout():
 
 # GPT 문제 생성 함수
 def get_random_for_problem(category="for문", difficulty="초급"):
-    prompt = f"Python의 '{category}' 개념을 연습할 수 있는 {difficulty} 난이도의 문제를 하나 만들어줘."
+    prompt = (
+        f"Python의 '{category}' 개념을 연습할 수 있는 {difficulty} 난이도의 문제를 아래와 같은 형식으로 만들어줘.\n"
+        "반드시 아래 세 가지 항목을 각각 명확히 구분해서 출력해야 해.\n\n"
+        "### 문제:\n<문제 설명만 작성>\n\n"
+        "### 정답 코드:\n<문제를 풀 수 있는 실행 가능한 파이썬 코드(주석 없이)>\n\n"
+        "### 정답 출력값:\n<정답 코드를 실행했을 때 나오는 출력값>"
+    )
     response = client.chat.completions.create(
         model="gpt-4-turbo",
         messages=[{"role": "user", "content": prompt}],
@@ -102,29 +108,42 @@ def get_random_for_problem(category="for문", difficulty="초급"):
     return response.choices[0].message.content.strip()
 
 def parse_problem_response(text):
-    prob_match = re.search(r"### 문제(?: 설명)?[:]?\s*(.+?)(?=### 정답 코드)", text, re.DOTALL)
-    code_match = re.search(r"### 정답 코드[:]?\s*(.+?)(?=### 정답 출력값)", text, re.DOTALL)
-    out_match = re.search(r"### 정답 출력값[:]?\s*(.+)", text, re.DOTALL)
-    return {
-        'problem': prob_match.group(1).strip() if prob_match else text.strip(),
-        'correct_code': code_match.group(1).strip() if code_match else '',
-        'correct_output': out_match.group(1).strip() if out_match else ''
-    }
+    # 1) 헤더 이름들(문제, 정답 코드, 정답 출력값)을 리스트로 뽑고
+    headers = re.findall(r"###\s*(문제|정답 코드|정답 출력값)\s*:", text)
+    # 2) 헤더 토큰으로 본문을 분할 → 첫 조각(헤더 전 텍스트) 제거
+    parts = re.split(r"###\s*(?:문제|정답 코드|정답 출력값)\s*:\s*", text)[1:]
+    # 3) 결과를 담을 dict
+    data = {'problem': '', 'correct_code': '', 'correct_output': ''}
+    # 4) 헤더 순서대로 내용을 매핑
+    for header, content in zip(headers, parts):
+        content = content.strip()
+        if header == '문제':
+            data['problem'] = content
+        elif header == '정답 코드':
+            data['correct_code'] = content
+        elif header == '정답 출력값':
+            data['correct_output'] = content
+    return data
+
 
 # 논리 채점 함수
 def ask_gpt_is_logically_correct(problem, user_code, user_output, correct_code, correct_output):
-    prompt = f"문제 설명:\n{problem}\n" + \
-             f"GPT 정답 코드:\n{correct_code}\n" + \
-             f"GPT 예상 출력:\n{correct_output}\n" + \
-             f"사용자 코드:\n{user_code}\n" + \
-             f"사용자 출력 결과:\n{user_output}\n" + \
-             "위 코드가 문제를 정확히 해결했으면 '정답입니다', 아니면 '오답입니다'라고만 답하세요."
+    prompt = (
+        f"문제 설명:\n{problem}\n\n"
+        f"GPT 정답 코드:\n{correct_code}\n\n"
+        f"GPT 예상 출력:\n{correct_output}\n\n"
+        f"사용자 코드:\n{user_code}\n\n"
+        f"사용자 출력 결과:\n{user_output}\n\n"
+        "사용자 코드가 GPT 정답 코드와는 다를 수 있어도, 문제를 논리적으로 정확히 해결했다면 '정답입니다'라고만 답하세요. "
+        "틀렸다면 '오답입니다'라고 명확하게 답하세요. 추가로 간단한 오답 이유/해설을 설명하세요."
+    )
     response = client.chat.completions.create(
         model="gpt-4-turbo",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.5,
     )
     return response.choices[0].message.content.strip()
+
 
 # 문제 생성 라우트
 @app.route('/generate', methods=['POST'])
@@ -169,11 +188,65 @@ def submit():
 def history():
     if 'user' not in session:
         return redirect(url_for('login'))
+    user_id = session['user']['id']
     db = get_db()
-    records = db.execute("SELECT * FROM history WHERE user_id=? ORDER BY id DESC", (session['user']['id'],)).fetchall()
+
+    # 필터 값 받기
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
+    is_correct = request.args.get('is_correct')
+
+    # 기본 쿼리
+    query = "SELECT * FROM history WHERE user_id=?"
+    params = [user_id]
+
+    # 날짜 필터
+    if start_date and end_date:
+        query += " AND date(timestamp) BETWEEN ? AND ?"
+        params.extend([start_date, end_date])
+
+    # 정답/오답 필터
+    if is_correct in ("0", "1"):
+        query += " AND is_correct=?"
+        params.append(int(is_correct))
+
+    query += " ORDER BY id DESC"
+    records = db.execute(query, params).fetchall()
+
     total = len(records)
     correct = len([r for r in records if r['is_correct']])
+
     return render_template('history.html', user=session['user'], records=records, total=total, correct=correct)
+
+# 계정 설정(비번/정보 변경)
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    db = get_db()
+    user = db.execute("SELECT * FROM users WHERE id=?", (session['user']['id'],)).fetchone()
+    message = None
+    if request.method == 'POST':
+        current = request.form['current_password']
+        new = request.form['new_password']
+        new_name = request.form.get('new_name', user['name'])
+        new_univ = request.form.get('new_university', user['university'])
+        if user['password'] != current:
+            message = "❌ 현재 비밀번호가 올바르지 않습니다."
+        elif not new:
+            message = "❌ 새 비밀번호를 입력해주세요."
+        else:
+            db.execute(
+                "UPDATE users SET password=?, name=?, university=? WHERE id=?",
+                (new, new_name, new_univ, user['id'])
+            )
+            db.commit()
+            session['user']['name'] = new_name
+            session['user']['university'] = new_univ
+            message = "✅ 정보가 성공적으로 변경되었습니다."
+    return render_template('settings.html', user=user, message=message)
+
+
 
 if __name__ == '__main__':
     init_db()

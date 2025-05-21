@@ -7,30 +7,44 @@
 </head>
 <body>
     <div class="container">
-        <h1>💡 문제</h1>
-        <div class="result-box">{{ problem }}</div>
-
-        <h2>🔎 실행 결과</h2>
-        <div class="result-box">{{ result }}</div>
-
-        {% if is_correct %}
-            <h2 class="correct">✅ 정답입니다!</h2>
+        {% if not code %}
+            <!-- 코드가 입력되지 않은 경우 -->
+            <div class="alert error">❗ 코드를 입력하지 않으셨습니다.</div>
+            <div class="button-box">
+                <a href="/" class="button">🔁 문제 다시 출제하기</a>
+            </div>
         {% else %}
-            <h2 class="wrong">❌ 오답입니다</h2>
+            <h1>💡 문제</h1>
+            <div class="result-box">{{ problem }}</div>
+
+            <h2>🔎 실행 결과</h2>
+            <div class="result-box">{{ result }}</div>
+
+            {% if is_correct %}
+                <h2 class="correct">✅ 정답입니다!</h2>
+            {% else %}
+                <h2 class="wrong">❌ 오답입니다</h2>
+
+                <h3>🧠 GPT 채점 의견</h3>
+                <div class="judgement-box">
+                    {{ gpt_judgement or '채점 의견을 불러올 수 없습니다.' }}
+                </div>
+
+                {% if correct_code %}
+                <h3>📘 GPT 정답 코드</h3>
+                <div class="code-box">{{ correct_code }}</div>
+                {% endif %}
+
+                {% if correct_output %}
+                <h3>📤 GPT 정답 출력값</h3>
+                <div class="result-box">{{ correct_output }}</div>
+                {% endif %}
+            {% endif %}
+
+            <div class="button-box">
+                <a href="/" class="button">🔁 문제 다시 출제하기</a>
+            </div>
         {% endif %}
-
-        <h3>🧠 GPT 채점 의견</h3>
-        <div class="judgement-box">{{ gpt_judgement }}</div>
-
-        <h3>📘 GPT 정답 코드</h3>
-        <div class="code-box">{{ correct_code }}</div>
-
-        <h3>📤 GPT 정답 출력값</h3>
-        <div class="result-box">{{ correct_output }}</div>
-
-        <div class="button-box">
-            <a href="/" class="button">🔁 문제 다시 출제하기</a>
-        </div>
     </div>
 </body>
 </html>

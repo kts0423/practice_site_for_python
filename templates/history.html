@@ -1,75 +1,78 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>사용자 히스토리</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
-</head>
-<body>
-<div class="container">
-    <h1>📜 사용자 히스토리 - {{ user.name }}</h1>
-    <p><a href="/">← 메인으로 돌아가기</a></p>
+{% extends "base.html" %}
+{% block title %}내 히스토리{% endblock %}
 
-    <form method="get" action="{{ url_for('history') }}" style="margin-bottom: 20px;">
-        <label>카테고리:</label>
-        <input type="text" name="category" value="{{ request.args.get('category', '') }}">
-        <label style="margin-left: 20px;">시작일:</label>
-        <input type="date" name="start" value="{{ request.args.get('start', '') }}">
-        <label style="margin-left: 10px;">종료일:</label>
-        <input type="date" name="end" value="{{ request.args.get('end', '') }}">
-        <button type="submit">🔍 필터</button>
-    </form>
+{% block content %}
+<h1>내 풀이 히스토리</h1>
 
-    <p>총 문제 수: {{ total }} | 정답 수: {{ correct }} | 정답률: {{ '%.0f' % ((correct / total * 100) if total else 0) }}%</p>
-
-    <canvas id="accuracyChart"
-            width="400"
-            height="200"
-            data-correct="{{ correct }}"
-            data-total="{{ total }}">
-    </canvas>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const canvas = document.getElementById('accuracyChart');
-        const correct = parseInt(canvas.dataset.correct);
-        const total = parseInt(canvas.dataset.total);
-
-        const chart = new Chart(canvas.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: ['정답', '오답'],
-                datasets: [{
-                    data: [correct, total - correct],
-                    backgroundColor: ['#00e676', '#ff5252'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#f1f1f1' }
-                    }
-                }
-            }
-        });
-    </script>
-
-    {% for item in records %}
-        <div class="result-box">
-            <strong>제출 시각:</strong> {{ item.timestamp }}<br>
-            <strong>문제:</strong> {{ item.problem }}<br><br>
-            <strong>내 코드:</strong><pre>{{ item.code }}</pre>
-            <strong>출력:</strong><pre>{{ item.output }}</pre>
-            <strong>결과:</strong>
-            <span class="{{ 'correct' if item.is_correct else 'wrong' }}">
-                {{ '정답' if item.is_correct else '오답' }}
-            </span>
-        </div>
-    {% else %}
-        <p>기록이 없습니다.</p>
-    {% endfor %}
+<!-- 통계 -->
+<div class="history-summary">
+    <span>총 문제: {{ total }}개</span> · 
+    <span class="correct">정답: {{ correct }}개</span> · 
+    <span class="wrong">오답: {{ total - correct }}개</span>
+    <progress value="{{ correct }}" max="{{ total }}"></progress>
 </div>
-</body>
-</html>
+
+<!-- 필터링 -->
+<form class="filter-form" method="get">
+    <input type="date" name="start" value="{{ request.args.get('start', '') }}">
+    <input type="date" name="end" value="{{ request.args.get('end', '') }}">
+    <select name="is_correct">
+        <option value="">전체</option>
+        <option value="1" {% if request.args.get('is_correct') == '1' %}selected{% endif %}>정답만</option>
+        <option value="0" {% if request.args.get('is_correct') == '0' %}selected{% endif %}>오답만</option>
+    </select>
+    <button type="submit" class="btn">필터 적용</button>
+</form>
+
+<!-- 히스토리 테이블 -->
+<table class="history-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>날짜</th>
+            <th>문제 요약</th>
+            <th>정답여부</th>
+            <th>자세히</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in records %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ row.timestamp[:10] }}</td>
+            <td class="short-problem">{{ row.problem[:30] ~ ("..." if row.problem|length > 30) }}</td>
+            <td>
+                {% if row.is_correct %}
+                    <span class="correct">정답</span>
+                {% else %}
+                    <span class="wrong">오답</span>
+                {% endif %}
+            </td>
+            <td>
+                <button type="button" class="btn small detail-btn" onclick="openDetail({{ row.id }})">보기</button>
+            </td>
+        </tr>
+        <!-- 상세 모달/슬라이드 -->
+        <tr id="detail-{{ row.id }}" class="detail-row" style="display:none;">
+            <td colspan="5">
+                <div class="detail-box">
+                    <b>문제</b><div class="problem-box">{{ row.problem }}</div>
+                    <b>내 코드</b><div class="code-box">{{ row.code }}</div>
+                    <b>실행결과</b><div class="result-box">{{ row.output }}</div>
+                    <b>정답 코드</b><div class="code-box">{{ row.correct_code }}</div>
+                    <b>GPT 해설</b><div class="judgement-box">{{ row.gpt_judgement }}</div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function openDetail(id) {
+    let row = document.getElementById("detail-" + id);
+    row.style.display = (row.style.display === "none") ? "" : "none";
+}
+</script>
+
+{% endblock %}

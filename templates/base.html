@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}코딩 연습{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}" />
-  <!-- Font Awesome for icons -->
-  <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
+  <!-- Font Awesome for icons (공식 CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <style>
     :root {
       --nav-bg: #1f1f1f;
@@ -63,19 +63,19 @@
       transition: background 0.3s;
     }
     .dropbtn:hover {
-      background: darken(var(--accent-color), 10%);
+      background: #009f8c;
     }
     .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      top: 100%; /* 버튼 바로 아래에 위치 */
+      top: 100%;
       background-color: var(--nav-bg);
       min-width: 200px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.5);
       border-radius: 6px;
       overflow: hidden;
-      margin-top: 0; /* hover 갭 제거 */
+      margin-top: 0;
     }
     .dropdown-content a {
       color: var(--text-color);
@@ -96,33 +96,25 @@
     }
     main.container {
       max-width: 1200px;
-      margin: 5rem auto 2rem; /* leave space for header */
+      margin: 5rem auto 2rem;
       padding: 1rem;
     }
-    /* Responsive adjustments */
     @media (max-width: 600px) {
-      .greeting {
-        font-size: 1rem;
-      }
-      .dropbtn {
-        font-size: 1rem;
-        padding: 0.4rem;
-      }
+      .greeting { font-size: 1rem; }
+      .dropbtn { font-size: 1rem; padding: 0.4rem; }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-inner">
-      <div class="greeting">Python Coding Program</div>
+      <div class="greeting">안녕하세요, {{ user.name }}님</div>
       <div class="dropdown">
         <button class="dropbtn"><i class="fas fa-bars"></i></button>
         <div class="dropdown-content">
           <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> 홈</a>
           <a href="{{ url_for('history') }}"><i class="fas fa-history"></i> 내 히스토리</a>
-          {% if user.is_admin %}
-          <a href="{{ url_for('admin_user_list') }}"><i class="fas fa-users-cog"></i> 사용자 관리</a>
-          {% endif %}
+          <a href="{{ url_for('settings') }}"><i class="fas fa-user-cog"></i> 설정</a>
           <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
         </div>
       </div>
