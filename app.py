@@ -96,7 +96,7 @@ def get_random_for_problem(category="for문", difficulty="초급"):
     prompt = (
         f"Python의 '{category}' 개념을 연습할 수 있는 {difficulty} 난이도의 문제를 아래와 같은 형식으로 만들어줘.\n"
         "반드시 아래 세 가지 항목을 각각 명확히 구분해서 출력해야 해.\n\n"
-        "### 문제:\n<문제 설명만 작성>\n\n"
+        "### 문제:\n<문제 설명만 작성하고 input() 함수는 출제 금지>\n\n"
         "### 정답 코드:\n<문제를 풀 수 있는 실행 가능한 파이썬 코드(주석 없이)>\n\n"
         "### 정답 출력값:\n<정답 코드를 실행했을 때 나오는 출력값>"
     )
@@ -245,6 +245,20 @@ def settings():
             session['user']['university'] = new_univ
             message = "✅ 정보가 성공적으로 변경되었습니다."
     return render_template('settings.html', user=user, message=message)
+
+# 리더보드 라우트
+@app.route('/leaderboard')
+def leaderboard():
+    db = get_db()
+    rows = db.execute("""
+        SELECT u.username, u.name, u.university, COUNT(h.id) as solved
+        FROM users u
+        LEFT JOIN history h ON u.id = h.user_id AND h.is_correct = 1
+        GROUP BY u.id
+        ORDER BY solved DESC, u.username ASC
+        LIMIT 30
+    """).fetchall()
+    return render_template('leaderboard.html', user=session.get('user'), leaderboard=rows)
 
 
 

@@ -1,50 +1,43 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>실행 결과</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dark.css') }}">
-</head>
-<body>
-    <div class="container">
-        {% if not code %}
-            <!-- 코드가 입력되지 않은 경우 -->
-            <div class="alert error">❗ 코드를 입력하지 않으셨습니다.</div>
-            <div class="button-box">
-                <a href="/" class="button">🔁 문제 다시 출제하기</a>
-            </div>
+{% extends "base.html" %}
+
+{% block title %}실행 결과{% endblock %}
+
+{% block content %}
+    {% if not code %}
+        <div class="alert error">❗ 코드를 입력하지 않으셨습니다.</div>
+        <div class="button-box">
+            <a href="/" class="button">🔁 문제 다시 출제하기</a>
+        </div>
+    {% else %}
+        <h1>💡 문제</h1>
+        <div class="result-box">{{ problem }}</div>
+
+        <h2>🔎 실행 결과</h2>
+        <div class="result-box">{{ result }}</div>
+
+        {% if is_correct %}
+            <h2 class="correct">✅ 정답입니다!</h2>
         {% else %}
-            <h1>💡 문제</h1>
-            <div class="result-box">{{ problem }}</div>
+            <h2 class="wrong">❌ 오답입니다</h2>
 
-            <h2>🔎 실행 결과</h2>
-            <div class="result-box">{{ result }}</div>
+            <h3>🧠 채점 의견</h3>
+            <div class="judgement-box">
+                {{ gpt_judgement or '채점 의견을 불러올 수 없습니다.' }}
+            </div>
 
-            {% if is_correct %}
-                <h2 class="correct">✅ 정답입니다!</h2>
-            {% else %}
-                <h2 class="wrong">❌ 오답입니다</h2>
-
-                <h3>🧠 GPT 채점 의견</h3>
-                <div class="judgement-box">
-                    {{ gpt_judgement or '채점 의견을 불러올 수 없습니다.' }}
-                </div>
-
-                {% if correct_code %}
-                <h3>📘 GPT 정답 코드</h3>
-                <div class="code-box">{{ correct_code }}</div>
-                {% endif %}
-
-                {% if correct_output %}
-                <h3>📤 GPT 정답 출력값</h3>
-                <div class="result-box">{{ correct_output }}</div>
-                {% endif %}
+            {% if correct_code %}
+            <h3>📘 정답 코드</h3>
+            <div class="code-box">{{ correct_code }}</div>
             {% endif %}
 
-            <div class="button-box">
-                <a href="/" class="button">🔁 문제 다시 출제하기</a>
-            </div>
+            {% if correct_output %}
+            <h3>📤 정답 출력값</h3>
+            <div class="result-box">{{ correct_output }}</div>
+            {% endif %}
         {% endif %}
-    </div>
-</body>
-</html>
+
+        <div class="button-box">
+            <a href="/" class="button">🔁 문제 다시 출제하기</a>
+        </div>
+    {% endif %}
+{% endblock %}

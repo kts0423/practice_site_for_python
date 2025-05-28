@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}리더보드{% endblock %}
+{% block content %}
+<h2 style="text-align:center; margin-top:2rem;"><i class="fas fa-trophy"></i> 리더보드</h2>
+<div class="container">
+  <table style="width:100%; border-collapse:collapse; background:#232338; border-radius:12px; overflow:hidden;">
+    <thead>
+      <tr style="background:var(--accent-color); color:#232338; font-weight:700;">
+        <th style="padding:10px;">순위</th>
+        <th style="padding:10px;">이름</th>
+        <th style="padding:10px;">아이디</th>
+        <th style="padding:10px;">대학교</th>
+        <th style="padding:10px;">맞춘 문제 수</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in leaderboard %}
+      <tr style="text-align:center;">
+        <td style="padding:8px;">{{ loop.index }}</td>
+        <td style="padding:8px;">{{ row['name'] }}</td>
+        <td style="padding:8px;">{{ row['username'] }}</td>
+        <td style="padding:8px;">{{ row['university'] }}</td>
+        <td style="padding:8px; font-weight:600;">{{ row['solved'] }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
